@@ -1,0 +1,144 @@
+:root {
+  color-scheme: light dark;
+  /* Grey */
+  --color-grey-0: #fff;
+  --color-grey-50: #f9fafb;
+  --color-grey-100: #f3f4f6;
+  --color-grey-200: #e5e7eb;
+  --color-grey-300: #d1d5db;
+  --color-grey-400: #9ca3af;
+  --color-grey-500: #6b7280;
+  --color-grey-600: #4b5563;
+  --color-grey-700: #374151;
+  --color-grey-800: #1f2937;
+  --color-grey-900: #111827;
+
+  --color-red-100: #fee2e2;
+  --color-red-800: #991b1b;
+  --background-color-main: #1a1a1a;
+  --background-color-hover: #fffce6;
+  --backdrop-color: rgba(255, 255, 255, 0.1);
+  /* Indigo */
+  --color-brand-main-1: #000;
+  --color-brand-main-2: #228be6;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0px 0.6rem 2.4rem rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 2.4rem 3.2rem rgba(0, 0, 0, 0.12);
+
+  --image-grayscale: 0;
+  --image-opacity: 100%;
+
+  --border-radius-tiny: 3px;
+  --border-radius-sm: 5px;
+  --border-radius-md: 7px;
+  --border-radius-lg: 9px;
+
+  /* light mode */
+  --body-background-color: var(--color-grey-50);
+  --text-color: var(--color-brand-main-1);
+  --image-background: var(--color-grey-0);
+}
+/* .dark-theme {
+  --body-background-color: var(--color-grey-900);
+  --text-color: var(--color-grey-50);
+  --image-background: var(--color-grey-800);
+} */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+
+  /* like we dont need to define it in each element use hover and in Creating animations for dark mode  */
+  transition: background-color 0.3s, border 0.3s;
+}
+.dark-theme {
+  --body-background-color: var(--color-grey-900);
+  --text-color: var(--color-grey-50);
+  --image-background: var(--color-grey-800);
+}
+/* 10px = 1rem */
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-family: "Open Sans", sans-serif;
+  color: var(--text-color);
+  background: var(--body-background-color);
+  /* color: light-dark(#111827, #f9fafb);
+  background: light-dark(#f9fafb, #111827); */
+  transition: color 0.3s, background-color 0.3s;
+  line-height: 1.5;
+  font-size: 1.6rem;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+*:disabled {
+  cursor: not-allowed;
+}
+
+select:disabled,
+button:disabled,
+input:disabled {
+  /* background-color: var(--background-color-main); */
+  color: var(--color-brand-main);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid var(--color-brand-main-2);
+  outline-offset: -1px;
+}
+
+/* Parent selector, finally 😃 */
+button:has(svg) {
+  line-height: 0;
+}
+
+ul {
+  list-style: none;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+img {
+  max-width: 100%;
+
+  /* For dark mode */
+  filter: grayscale(var(--image-grayscale)) opacity(var(--image-opacity));
+}
+.logo {
+  height: 12rem;
+  aspect-ratio: 3/1;
+  background-color: transparent;
+}
+.flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
