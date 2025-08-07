@@ -73,6 +73,7 @@ export const uploadImageForStore = async (req, res) => {
   //console.log(response.secure_url);
   //console.log(req.user.profilePictureID);
   let moderationResponse;
+  // https://sightengine.com/
   try {
     moderationResponse = await axios.get(
       "https://api.sightengine.com/1.0/check.json",
@@ -195,7 +196,7 @@ export const uploadProduct = async (req, res) => {
 
     const response = await uploadPromise; // Wait for Cloudinary response
     //console.log(response.secure_url);
-
+    // https://sightengine.com/
     const moderationResponse = await axios.get(
       "https://api.sightengine.com/1.0/check.json",
       {
