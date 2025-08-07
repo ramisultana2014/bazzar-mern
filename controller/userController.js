@@ -13,6 +13,7 @@ import OrderModel from "../models/OrderModel.js";
 import ProductInOrderModel from "../models/ProductInOrderModel.js";
 import mongoose from "mongoose";
 import day from "dayjs";
+import axios from "axios";
 // const upload = multer({
 //   limits: { fileSize: 15000000 },
 //   fileFilter(req, file, cb) {
@@ -71,6 +72,41 @@ export const uploadImageForStore = async (req, res) => {
   const response = await uploadPromise; // Wait for Cloudinary response
   //console.log(response.secure_url);
   //console.log(req.user.profilePictureID);
+  let moderationResponse;
+  try {
+    moderationResponse = await axios.get(
+      "https://api.sightengine.com/1.0/check.json",
+      {
+        params: {
+          url: response.secure_url, // Cloudinary image URL
+          models: "nudity-2.0,wad", // WAD = weapons, alcohol, drugs
+          api_user: process.env.SIGHTENGINE_API_USER,
+          api_secret: process.env.SIGHTENGINE_API_SECRET,
+        },
+      }
+    );
+
+    const data = moderationResponse.data;
+
+    // Check if inappropriate content detected
+    const { nudity, weapon, alcohol, drugs } = data;
+    const { sexual_activity, sexual_display } = nudity;
+
+    if (
+      sexual_activity > 0.5 ||
+      sexual_display > 0.5 ||
+      weapon > 0.5 ||
+      alcohol > 0.5 ||
+      drugs > 0.5
+    ) {
+      // Delete image from Cloudinary
+      await await cloudinary.v2.uploader.destroy(response.public_id);
+      throw new BadRequestError("Inappropriate content detected ");
+    }
+  } catch (error) {
+    await await cloudinary.v2.uploader.destroy(response.public_id);
+    throw new BadRequestError("Failed to verify image content");
+  }
   if (req.user.storeProfilePictureID && req.body.storeProfilePicture) {
     await cloudinary.v2.uploader.destroy(req.user.storeProfilePictureID);
   }
@@ -160,6 +196,36 @@ export const uploadProduct = async (req, res) => {
     const response = await uploadPromise; // Wait for Cloudinary response
     //console.log(response.secure_url);
 
+    const moderationResponse = await axios.get(
+      "https://api.sightengine.com/1.0/check.json",
+      {
+        params: {
+          url: response.secure_url, // Cloudinary image URL
+          models: "nudity-2.0,wad", // WAD = weapons, alcohol, drugs
+          api_user: process.env.SIGHTENGINE_API_USER,
+          api_secret: process.env.SIGHTENGINE_API_SECRET,
+        },
+      }
+    );
+
+    const data = moderationResponse.data;
+
+    // Check if inappropriate content detected
+    const { nudity, weapon, alcohol, drugs } = data;
+    const { sexual_activity, sexual_display } = nudity;
+
+    if (
+      sexual_activity > 0.5 ||
+      sexual_display > 0.5 ||
+      weapon > 0.5 ||
+      alcohol > 0.5 ||
+      drugs > 0.5
+    ) {
+      // Delete image from Cloudinary
+      await await cloudinary.v2.uploader.destroy(response.public_id);
+      throw new BadRequestError("Inappropriate content detected ");
+    }
+
     const productObj = {
       title: req.body.title,
       price: Number(req.body.price),
@@ -183,6 +249,8 @@ export const uploadProduct = async (req, res) => {
     } else if (err.code === 11000) {
       // For unique errors like email or storeName
       throw new BadRequestError("Email or store name already exists");
+    } else if (err.statusCode === 400) {
+      throw new BadRequestError(`${err.message}`);
     } else {
       throw new InternalServerError("Something went wrong, please try again");
     }
